@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>식품안전기사 100일 로그북</title>
+<style>
+  :root{
+    --paper:#F5F4EF;
+    --panel:#FFFFFF;
+    --ink:#1E2A2E;
+    --ink-soft:#5B6B6E;
+    --line:#DCE1DC;
+    --lab:#2F7A6D;
+    --lab-soft:#E4F0EC;
+    --amber:#D98E2E;
+    --amber-soft:#FBEBD3;
+    --red:#C1493D;
+    --red-soft:#F6E4E1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:24px 18px 60px;}
+  h1,h2,h3{font-family:Georgia,"Nanum Myeongjo",serif; font-weight:700; margin:0;}
+  .top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+  .top .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase;}
+  .top h1{font-size:22px;}
+  .num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums;}
+
+  .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--line);}
+  .tab{padding:9px 14px;font-size:14px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;user-select:none;}
+  .tab.active{color:var(--ink);border-bottom:2px solid var(--lab);font-weight:600;}
+  .panel{display:none;} .panel.active{display:block;}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+  @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr);}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .card .label{font-size:11px;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:6px;}
+  .card .big{font-size:28px;font-weight:700;}
+  .card .sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .amber .big{color:var(--amber);}
+  .lab .big{color:var(--lab);}
+  .red .big{color:var(--red);}
+
+  .section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px;}
+  .section h3{font-size:14px;margin-bottom:12px;}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+  .bar-row .name{width:150px;flex-shrink:0;color:var(--ink-soft);}
+  .bar-track{flex:1;height:9px;background:var(--lab-soft);border-radius:5px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--lab);border-radius:5px;transition:width .3s;}
+  .bar-pct{width:42px;text-align:right;font-family:ui-monospace,monospace;font-size:12px;}
+
+  .heat{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;}
+  .cell{aspect-ratio:1;border-radius:3px;background:var(--line);}
+  .cell.done{background:var(--lab);}
+  .cell.today{outline:2px solid var(--amber);outline-offset:1px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+  th{font-size:11px;color:var(--ink-soft);font-weight:600;}
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);width:100%;
+  }
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--lab);}
+  button{
+    font-family:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:7px;border:none;
+    background:var(--lab);color:#fff;cursor:pointer;
+  }
+  button.ghost{background:transparent;color:var(--lab);border:1px solid var(--lab);}
+  button.small{padding:5px 10px;font-size:12px;}
+  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .today-goal{background:var(--amber-soft);border:1px solid #ECC98A;border-radius:10px;padding:16px;}
+  .today-goal h2{font-size:18px;color:#8A5A15;}
+  .goal-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #ECC98A;font-size:14px;}
+  .goal-item:last-child{border-bottom:none;}
+  .goal-item.checked span{text-decoration:line-through;color:var(--ink-soft);}
+  .setrow{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;}
+  .setrow label{display:flex;flex-direction:column;gap:4px;color:var(--ink-soft);}
+  .empty{color:var(--ink-soft);font-size:13px;padding:12px 0;}
+  .del{background:none;color:var(--red);border:none;cursor:pointer;font-size:12px;padding:2px 6px;}
+  .badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:var(--lab-soft);color:var(--lab);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="eyebrow">FOOD SAFETY ENGINEER · 100-DAY LOGBOOK</div>
+      <h1>식품안전기사 실기 준비 로그</h1>
+    </div>
+    <div class="flex">
+      <button class="ghost small" id="settingsBtn">⚙ 설정</button>
+    </div>
+  </div>
+
+  <div id="settingsPanel" class="section" style="display:none;">
+    <h3>설정</h3>
+    <div class="setrow">
+      <label>시작일 <input type="date" id="startDate"></label>
+      <label>목표 시험일(D-Day) <input type="date" id="examDate"></label>
+    </div>
+    <button class="small" id="saveSettings">저장</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="dash">📚 대시보드</div>
+    <div class="tab" data-tab="today">📅 오늘 공부</div>
+    <div class="tab" data-tab="subjects">📖 과목별 진도</div>
+    <div class="tab" data-tab="exam">📝 기출문제 관리</div>
+    <div class="tab" data-tab="wrong">❌ 오답노트</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panel-dash">
+    <div class="grid">
+      <div class="card amber"><div class="label">D-DAY</div><div class="big num" id="stat-dday">-</div><div class="sub" id="stat-dday-sub"></div></div>
+      <div class="card lab"><div class="label">진도율</div><div class="big num" id="stat-progress">0%</div><div class="sub" id="stat-progress-sub">0/100일</div></div>
+      <div class="card"><div class="label">🔥 연속 공부일</div><div class="big num" id="stat-streak">0일</div><div class="sub">최근 기록 기준</div></div>
+      <div class="card"><div class="label">⏱ 누적 공부시간</div><div class="big num" id="stat-time">0h</div><div class="sub" id="stat-time-sub">0분</div></div>
+    </div>
+
+    <div class="section">
+      <h3>📊 과목별 진도 그래프</h3>
+      <div id="subjectBars"></div>
+    </div>
+
+    <div class="section">
+      <h3>100일 학습 현황 (실험 기록장)</h3>
+      <div class="heat" id="heatmap"></div>
+    </div>
+
+    <div class="section">
+      <h3>📈 자동 통계</h3>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="card"><div class="label">총 문제 수</div><div class="big num" id="stat-totalq">0</div></div>
+        <div class="card"><div class="label">총 기출 회차</div><div class="big num" id="stat-examrounds">0</div></div>
+        <div class="card"><div class="label">최근 모의고사 평균</div><div class="big num" id="stat-avgscore">-</div></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="label">합격 예측 점수 (최근 3회 평균, 60점 이상 합격)</div>
+        <div class="big num" id="stat-predict">-</div>
+        <div class="sub" id="stat-predict-sub"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY -->
+  <div class="panel" id="panel-today">
+    <div class="today-goal" id="todayGoalBox"></div>
+    <div class="section">
+      <h3>다른 날짜 확인 / 수정하기</h3>
+      <div class="flex">
+        <button class="ghost small" id="prevDay">← 이전 Day</button>
+        <span id="dayNav" class="num" style="font-weight:600;"></span>
+        <button class="ghost small" id="nextDay">다음 Day →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBJECTS -->
+  <div class="panel" id="panel-subjects">
+    <div class="section">
+      <h3>📖 100일 커리큘럼 전체 (체크 시 진도율에 자동 반영)</h3>
+      <table>
+        <thead><tr><th>Day</th><th>과목</th><th>학습주제</th><th>목표</th><th>완료</th></tr></thead>
+        <tbody id="curriculumTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <div class="panel" id="panel-exam">
+    <div class="section">
+      <h3>📝 회차별 기출 기록 추가</h3>
+      <div class="setrow">
+        <label>회차 <input type="text" id="examRound" placeholder="예: 2023-1회"></label>
+        <label>총 문제수 <input type="number" id="examTotal" placeholder="100"></label>
+        <label>점수 <input type="number" id="examScore" placeholder="58"></label>
+        <label>틀린 문제 수 <input type="number" id="examWrong" placeholder="17"></label>
+      </div>
+      <button id="addExam" class="small">추가</button>
+    </div>
+    <div class="section">
+      <h3>기록 목록</h3>
+      <table>
+        <thead><tr><th>회차</th><th>점수</th><th>틀린문제</th><th>복습완료</th><th></th></tr></thead>
+        <tbody id="examTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WRONG -->
+  <div class="panel" id="panel-wrong">
+    <div class="section">
+      <h3>❌ 오답 추가</h3>
+      <div class="setrow">
+        <label style="min-width:160px;">과목
+          <select id="wrongSubject">
+            <option>1과목 식품안전</option>
+            <option>2과목 식품화학</option>
+            <option>3과목 식품가공·공정공학</option>
+            <option>4과목 식품미생물및생화학</option>
+          </select>
+        </label>
+        <label style="flex:1;min-width:200px;">문제 <input type="text" id="wrongQ" placeholder="예: HACCP 7원칙 순서"></label>
+        <label style="flex:1;min-width:200px;">틀린 이유 <input type="text" id="wrongReason" placeholder="예: 순서 암기 부족"></label>
+      </div>
+      <button id="addWrong" class="small">추가</button>
+    </div>
+    <div class="section">
+      <h3>오답노트 (복습 체크만 하면 자동 누적)</h3>
+      <table>
+        <thead><tr><th>과목</th><th>문제</th><th>틀린 이유</th><th>복습1</th><th>복습2</th><th>완벽</th><th></th></tr></thead>
+        <tbody id="wrongTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CURRICULUM_RAW = [
+["1과목 식품안전",["식품안전관리 개요 및 법적 체계","식품위생법 총칙","식품위생법 - 영업허가/신고","식품위생법 - 표시기준","식품등의 기준 및 규격 총론","식품첨가물공전 개요","유해물질관리 - 중금속","유해물질관리 - 잔류농약","유해물질관리 - 곰팡이독소","HACCP 개요 및 도입배경","HACCP - 12절차 7원칙 (1)","HACCP - 12절차 7원칙 (2)","HACCP - 선행요건프로그램(PRP)","HACCP - 검증 및 사후관리","제품검사관리 - 검사의 종류","제품검사관리 - 시료채취","제품검사관리 - 규격기준시험","식품위해요소 리스크분석","소비자 위해정보 관리","복습 - 식품위생법령 전체","복습 - HACCP 전체","총복습 및 오답노트 정리(1과목)"]],
+["2과목 식품화학",["수분과 수분활성도","탄수화물 구조와 성질","탄수화물 - 전분의 호화와 노화","단백질 구조와 성질","단백질 - 변성","지질 구조와 분류","지질 - 산패(자동산화)","지질 - 유지의 물리화학적 특성","비타민 - 지용성","비타민 - 수용성","무기질","효소 - 종류와 작용","효소 - 갈변반응(효소적)","비효소적 갈변(마이야르반응)","식품의 색(색소성분)","식품의 맛(맛성분)","식품의 향(향기성분)","식품의 물성(텍스처)","식품첨가물 - 보존료/산화방지제","식품첨가물 - 감미료/착색료","복습 - 성분편 전체","총복습 및 오답노트 정리(2과목)"]],
+["3과목 식품가공·공정공학",["농산식품가공 - 곡류가공","농산식품가공 - 두류/서류가공","농산식품가공 - 과채류가공","축산식품가공 - 육류가공","축산식품가공 - 우유 및 유제품","축산식품가공 - 알가공","수산식품가공","유지가공 - 채유와 정제","유지가공 - 경화유","발효식품가공 개요","식품공정공학 - 열전달 기초","식품공정공학 - 살균(저온/고온살균)","식품공정공학 - 멸균(레토르트)","식품공정공학 - 냉장/냉동","식품공정공학 - 건조(열풍/동결건조)","식품공정공학 - 농축/증발","식품공정공학 - 포장기술","식품공정공학 - 유체역학 기초","식품공정공학 - 물성측정","복습 - 가공편 전체","복습 - 공정공학편 전체","총복습 및 오답노트 정리(3과목)"]],
+["4과목 식품미생물및생화학",["미생물 개요 및 분류","세균의 구조와 특성","곰팡이의 구조와 특성","효모의 구조와 특성","바이러스","미생물의 생리 - 증식곡선","미생물의 생리 - 대사(호기/혐기)","미생물 제어 - 물리적 방법","미생물 제어 - 화학적 방법","식중독균 - 세균성(감염형)","식중독균 - 세균성(독소형)","식중독균 - 바이러스성/자연독","미생물 분리 보존 방법","균주개량(변이/유전자재조합)","발효공학 - 발효의 원리","발효공학 - 주류 발효","발효공학 - 장류/절임류 발효","생화학 - 대사경로 개요(해당과정)","생화학 - TCA회로/전자전달계","생화학 - 핵산과 단백질합성","복습 - 미생물편 전체","총복습 및 오답노트 정리(4과목)"]],
+["5. 기출문제 총정리",["최근 기출 1회분 풀이(전과목)","오답노트 정리","최근 기출 1회분 풀이(전과목)","오답노트 정리","최근 기출 1회분 풀이(전과목)","오답노트 정리","최근 기출 1회분 풀이(전과목)","오답노트 정리","실전모의고사(시간 재고 풀이)","오답노트+취약과목 집중 보완","최종 총복습(전과목 핵심노트 회독)","최종 점검 및 컨디션 관리(가벼운 복습만)"]]
+];
+
+function buildCurriculum(){
+  let day = 1; const out = [];
+  for (const [subject, topics] of CURRICULUM_RAW){
+    topics.forEach(topic => {
+      const review = topic.includes("복습");
+      out.push({
+        day: day++, subject, topic,
+        pages: review || subject.startsWith("5.") ? null : 20,
+        qTarget: review ? 40 : (subject.startsWith("5.") ? null : 25),
+        done:false, actualQ:0, wrongQ:0, minutes:0
+      });
+    });
+  }
+  return out;
+}
+
+let state = {
+  startDate: null, examDate: null,
+  days: null, studyLog: [], examLogs: [], wrongNotes: []
+};
+let currentDayView = 1;
+
+async function load(){
+  try{ const v = localStorage.getItem('days'); state.days = v ? JSON.parse(v) : buildCurriculum(); }
+  catch(e){ state.days = buildCurriculum(); }
+  try{ const v = localStorage.getItem('settings'); const s = v?JSON.parse(v):{}; state.startDate=s.startDate||null; state.examDate=s.examDate||null; }catch(e){}
+  try{ const v = localStorage.getItem('studyLog'); state.studyLog = v?JSON.parse(v):[]; }catch(e){ state.studyLog=[]; }
+  try{ const v = localStorage.getItem('examLogs'); state.examLogs = v?JSON.parse(v):[]; }catch(e){ state.examLogs=[]; }
+  try{ const v = localStorage.getItem('wrongNotes'); state.wrongNotes = v?JSON.parse(v):[]; }catch(e){ state.wrongNotes=[]; }
+}
+async function saveDays(){ try{ localStorage.setItem('days', JSON.stringify(state.days)); }catch(e){console.error(e);} }
+async function saveSettings(){ try{ localStorage.setItem('settings', JSON.stringify({startDate:state.startDate, examDate:state.examDate})); }catch(e){console.error(e);} }
+async function saveStudyLog(){ try{ localStorage.setItem('studyLog', JSON.stringify(state.studyLog)); }catch(e){console.error(e);} }
+async function saveExamLogs(){ try{ localStorage.setItem('examLogs', JSON.stringify(state.examLogs)); }catch(e){console.error(e);} }
+async function saveWrongNotes(){ try{ localStorage.setItem('wrongNotes', JSON.stringify(state.wrongNotes)); }catch(e){console.error(e);} }
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+
+function getCurrentDayIndex(){
+  if(!state.startDate) return 1;
+  const diff = daysBetween(state.startDate, todayStr()) + 1;
+  return Math.min(Math.max(diff,1),100);
+}
+
+function computeStreak(){
+  if(!state.studyLog.length) return 0;
+  const set = new Set(state.studyLog);
+  let streak = 0;
+  let cursor = new Date();
+  // if today not logged yet, start checking from yesterday
+  if(!set.has(todayStr())){ cursor.setDate(cursor.getDate()-1); }
+  while(true){
+    const ds = cursor.toISOString().slice(0,10);
+    if(set.has(ds)){ streak++; cursor.setDate(cursor.getDate()-1); } else break;
+  }
+  return streak;
+}
+
+function renderDashboard(){
+  // D-Day
+  const ddayEl = document.getElementById('stat-dday');
+  const ddaySub = document.getElementById('stat-dday-sub');
+  if(state.examDate){
+    const d = daysBetween(todayStr(), state.examDate);
+    ddayEl.textContent = d >= 0 ? ('D-'+d) : ('D+'+Math.abs(d));
+    ddaySub.textContent = state.examDate;
+  } else { ddayEl.textContent='설정 필요'; ddaySub.textContent='⚙설정에서 시험일 입력'; }
+
+  const doneCount = state.days.filter(d=>d.done).length;
+  document.getElementById('stat-progress').textContent = Math.round(doneCount/100*100)+'%';
+  document.getElementById('stat-progress-sub').textContent = doneCount+'/100일';
+
+  document.getElementById('stat-streak').textContent = computeStreak()+'일';
+
+  const totalMin = state.days.reduce((a,d)=>a+(d.minutes||0),0);
+  document.getElementById('stat-time').textContent = (totalMin/60).toFixed(1)+'h';
+  document.getElementById('stat-time-sub').textContent = totalMin+'분';
+
+  const totalQ = state.days.reduce((a,d)=>a+(d.actualQ||0),0);
+  document.getElementById('stat-totalq').textContent = totalQ;
+  document.getElementById('stat-examrounds').textContent = state.examLogs.length;
+  const avg = state.examLogs.length ? (state.examLogs.reduce((a,e)=>a+Number(e.score||0),0)/state.examLogs.length) : null;
+  document.getElementById('stat-avgscore').textContent = avg!==null ? avg.toFixed(1)+'점' : '-';
+
+  const recent3 = state.examLogs.slice(-3);
+  const pred = recent3.length ? (recent3.reduce((a,e)=>a+Number(e.score||0),0)/recent3.length) : null;
+  const predEl = document.getElementById('stat-predict');
+  const predSub = document.getElementById('stat-predict-sub');
+  if(pred!==null){
+    predEl.textContent = pred.toFixed(1)+'점';
+    predEl.style.color = pred>=60 ? 'var(--lab)' : 'var(--red)';
+    predSub.textContent = pred>=60 ? '현재 추세라면 합격권입니다' : '60점 미만 — 취약 과목 보완이 필요해요';
+  } else { predEl.textContent='-'; predSub.textContent='기출 3회 이상 기록하면 예측이 표시돼요'; }
+
+  // subject bars
+  const subjects = [...new Set(state.days.map(d=>d.subject))];
+  const barsHtml = subjects.map(subj=>{
+    const items = state.days.filter(d=>d.subject===subj);
+    const numeric = items.filter(d=>d.pages!==null);
+    let pct;
+    if(numeric.length){
+      const total = numeric.reduce((a,d)=>a+d.pages,0);
+      const done = numeric.filter(d=>d.done).reduce((a,d)=>a+d.pages,0);
+      pct = total? Math.round(done/total*100):0;
+    } else {
+      pct = Math.round(items.filter(d=>d.done).length/items.length*100);
+    }
+    return `<div class="bar-row"><div class="name">${subj}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-pct">${pct}%</div></div>`;
+  }).join('');
+  document.getElementById('subjectBars').innerHTML = barsHtml;
+
+  // heatmap
+  const curDay = getCurrentDayIndex();
+  document.getElementById('heatmap').innerHTML = state.days.map(d=>{
+    let cls = 'cell'+(d.done?' done':'')+(d.day===curDay?' today':'');
+    return `<div class="${cls}" title="Day${d.day} ${d.subject} - ${d.topic}"></div>`;
+  }).join('');
+}
+
+function renderToday(){
+  const curDay = currentDayView;
+  const item = state.days.find(d=>d.day===curDay);
+  document.getElementById('dayNav').textContent = 'Day '+curDay+' / 100';
+  if(!item){ document.getElementById('todayGoalBox').innerHTML='<div class="empty">데이터 없음</div>'; return; }
+  const pageGoal = item.pages ? `${item.pages}쪽` : '오답노트/기출 위주';
+  const qGoal = item.qTarget ? `${item.qTarget}문제` : '기출 1회분';
+  document.getElementById('todayGoalBox').innerHTML = `
+    <h2>Day ${item.day} 오늘의 목표 <span class="badge">${item.subject}</span></h2>
+    <div class="sub" style="margin-bottom:10px;color:#8A5A15;">${item.topic}</div>
+    <div class="goal-item ${item.done?'checked':''}">
+      <input type="checkbox" id="chkDone" ${item.done?'checked':''}>
+      <span>${item.subject} · ${pageGoal} 학습 완료</span>
+    </div>
+    <div class="goal-item"><span>목표 문제 수: ${qGoal} · 실제 푼 문제 수</span>
+      <input type="number" id="inpActualQ" value="${item.actualQ||0}" style="width:70px;">
+    </div>
+    <div class="goal-item"><span>오답 개수</span>
+      <input type="number" id="inpWrongQ" value="${item.wrongQ||0}" style="width:70px;">
+    </div>
+    <div class="goal-item"><span>공부 시간(분)</span>
+      <input type="number" id="inpMinutes" value="${item.minutes||0}" style="width:70px;">
+    </div>
+    <div style="margin-top:10px;"><button id="saveTodayBtn">오늘 기록 저장</button></div>
+  `;
+  document.getElementById('saveTodayBtn').onclick = async ()=>{
+    item.done = document.getElementById('chkDone').checked;
+    item.actualQ = Number(document.getElementById('inpActualQ').value)||0;
+    item.wrongQ = Number(document.getElementById('inpWrongQ').value)||0;
+    item.minutes = Number(document.getElementById('inpMinutes').value)||0;
+    if(item.done && !state.studyLog.includes(todayStr())){ state.studyLog.push(todayStr()); await saveStudyLog(); }
+    await saveDays();
+    renderAll();
+  };
+}
+
+function renderSubjectsTable(){
+  document.getElementById('curriculumTable').innerHTML = state.days.map(d=>{
+    const goal = d.pages ? `${d.pages}쪽/${d.qTarget}문제` : (d.qTarget?`${d.qTarget}문제`:'기출 1회분');
+    return `<tr>
+      <td class="num">${d.day}</td>
+      <td>${d.subject}</td>
+      <td>${d.topic}</td>
+      <td>${goal}</td>
+      <td><input type="checkbox" data-day="${d.day}" class="curDone" ${d.done?'checked':''}></td>
+    </tr>`;
+  }).join('');
+  document.querySelectorAll('.curDone').forEach(cb=>{
+    cb.onchange = async (e)=>{
+      const day = Number(e.target.dataset.day);
+      const item = state.days.find(d=>d.day===day);
+      item.done = e.target.checked;
+      if(item.done && !state.studyLog.includes(todayStr())){ state.studyLog.push(todayStr()); await saveStudyLog(); }
+      await saveDays();
+      renderDashboard();
+    };
+  });
+}
+
+function renderExamTable(){
+  document.getElementById('examTable').innerHTML = state.examLogs.map((e,i)=>`
+    <tr>
+      <td>${e.round}</td>
+      <td class="num">${e.score}점 ${e.total?('/'+e.total):''}</td>
+      <td class="num">${e.wrong}개</td>
+      <td><input type="checkbox" data-i="${i}" class="examReviewed" ${e.reviewed?'checked':''}></td>
+      <td><button class="del" data-i="${i}">삭제</button></td>
+    </tr>`).join('') || '';
+  if(!state.examLogs.length) document.getElementById('examTable').innerHTML = '<tr><td colspan="5" class="empty">아직 기록이 없어요</td></tr>';
+  document.querySelectorAll('.examReviewed').forEach(cb=>{
+    cb.onchange = async (e)=>{ state.examLogs[Number(e.target.dataset.i)].reviewed = e.target.checked; await saveExamLogs(); };
+  });
+  document.querySelectorAll('#examTable .del').forEach(btn=>{
+    btn.onclick = async (e)=>{ state.examLogs.splice(Number(e.target.dataset.i),1); await saveExamLogs(); renderAll(); };
+  });
+}
+
+function renderWrongTable(){
+  document.getElementById('wrongTable').innerHTML = state.wrongNotes.map((w,i)=>`
+    <tr>
+      <td>${w.subject}</td>
+      <td>${w.question}</td>
+      <td>${w.reason}</td>
+      <td><input type="checkbox" data-i="${i}" data-f="review1" class="wrongChk" ${w.review1?'checked':''}></td>
+      <td><input type="checkbox" data-i="${i}" data-f="review2" class="wrongChk" ${w.review2?'checked':''}></td>
+      <td><input type="checkbox" data-i="${i}" data-f="perfect" class="wrongChk" ${w.perfect?'checked':''}></td>
+      <td><button class="del" data-i="${i}">삭제</button></td>
+    </tr>`).join('') || '';
+  if(!state.wrongNotes.length) document.getElementById('wrongTable').innerHTML = '<tr><td colspan="7" class="empty">아직 등록된 오답이 없어요</td></tr>';
+  document.querySelectorAll('.wrongChk').forEach(cb=>{
+    cb.onchange = async (e)=>{
+      state.wrongNotes[Number(e.target.dataset.i)][e.target.dataset.f] = e.target.checked;
+      await saveWrongNotes();
+    };
+  });
+  document.querySelectorAll('#wrongTable .del').forEach(btn=>{
+    btn.onclick = async (e)=>{ state.wrongNotes.splice(Number(e.target.dataset.i),1); await saveWrongNotes(); renderAll(); };
+  });
+}
+
+function renderAll(){
+  renderDashboard(); renderToday(); renderSubjectsTable(); renderExamTable(); renderWrongTable();
+}
+
+// nav
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  };
+});
+document.getElementById('settingsBtn').onclick = ()=>{
+  const p = document.getElementById('settingsPanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+  document.getElementById('startDate').value = state.startDate || '';
+  document.getElementById('examDate').value = state.examDate || '';
+};
+document.getElementById('saveSettings').onclick = async ()=>{
+  state.startDate = document.getElementById('startDate').value || null;
+  state.examDate = document.getElementById('examDate').value || null;
+  await saveSettings();
+  currentDayView = getCurrentDayIndex();
+  document.getElementById('settingsPanel').style.display='none';
+  renderAll();
+};
+document.getElementById('prevDay').onclick = ()=>{ currentDayView = Math.max(1,currentDayView-1); renderToday(); };
+document.getElementById('nextDay').onclick = ()=>{ currentDayView = Math.min(100,currentDayView+1); renderToday(); };
+
+document.getElementById('addExam').onclick = async ()=>{
+  const round = document.getElementById('examRound').value.trim();
+  const total = document.getElementById('examTotal').value;
+  const score = document.getElementById('examScore').value;
+  const wrong = document.getElementById('examWrong').value;
+  if(!round || score===''){ alert('회차와 점수는 필수예요'); return; }
+  state.examLogs.push({round, total, score, wrong, reviewed:false});
+  await saveExamLogs();
+  document.getElementById('examRound').value=''; document.getElementById('examTotal').value='';
+  document.getElementById('examScore').value=''; document.getElementById('examWrong').value='';
+  renderAll();
+};
+
+document.getElementById('addWrong').onclick = async ()=>{
+  const subject = document.getElementById('wrongSubject').value;
+  const question = document.getElementById('wrongQ').value.trim();
+  const reason = document.getElementById('wrongReason').value.trim();
+  if(!question){ alert('문제 내용을 입력해주세요'); return; }
+  state.wrongNotes.push({subject, question, reason, review1:false, review2:false, perfect:false});
+  await saveWrongNotes();
+  document.getElementById('wrongQ').value=''; document.getElementById('wrongReason').value='';
+  renderAll();
+};
+
+(async ()=>{
+  await load();
+  currentDayView = getCurrentDayIndex();
+  if(!state.days) state.days = buildCurriculum();
+  renderAll();
+})();
+</script>
+</body>
+</html>
